@@ -1,0 +1,29 @@
+{
+  "name": "rytm",
+  "version": "1.0.0",
+  "description": "Rytm – simplifique sua rotina e maximize sua produtividade.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yangclima/rytm.git"
+  },
+  "keywords": [
+    "rotina",
+    "produtividade",
+    "habitos"
+  ],
+  "author": "yanlima",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yangclima/rytm/issues"
+  },
+  "homepage": "https://github.com/yangclima/rytm#readme",
+  "dependencies": {
+    "next": "^15.5.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
