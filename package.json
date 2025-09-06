@@ -4,7 +4,11 @@
   "description": "Rytm – simplifique sua rotina e maximize sua produtividade.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint:check": "prettier --check",
+    "lint:fix": "prettier --write"
   },
   "repository": {
     "type": "git",
