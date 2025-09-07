@@ -1,10 +1,11 @@
 name: Linting
 
-on: [pull_request]
+on: pull_request
 
 jobs:
   prettier:
     name: Prettier
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -17,6 +18,7 @@ jobs:
       - run: npm run lint:prettier:check
   eslint:
     name: Eslint
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
