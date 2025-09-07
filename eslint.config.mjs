@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
+import pluginJest from 'eslint-plugin-jest';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,6 +16,13 @@ const eslintConfig = [
   ...compat.extends('next/core-web-vitals'),
   eslintConfigPrettier,
   js.configs.recommended,
+  {
+    files: ['**/*.spec.js', '**/*.test.js'],
+    plugins: { jest: pluginJest },
+    languageOptions: {
+      globals: pluginJest.environments.globals.globals,
+    },
+  },
   {
     ignores: [
       'node_modules/**',
