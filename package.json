@@ -13,6 +13,7 @@
     "test": "jest",
     "prepare": "husky",
     "commit": "cz",
+    "pre-commit": "lint-staged",
     "services:up": "docker compose -f './src/infra/compose.yaml' up -d",
     "services:stop": "docker compose -f './src/infra/compose.yaml' stop",
     "services:down": "docker compose -f './src/infra/compose.yaml' down"
