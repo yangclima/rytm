@@ -10,23 +10,25 @@
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "eslint",
-    "test": "jest",
+    "test": "npm run services:up && npm run wait-for-postgres && concurrently -n next,jest --hide next -s command-jest -k \"next dev\" \"jest --runInBand --verbose\"",
     "prepare": "husky",
     "commit": "cz",
     "pre-commit": "lint-staged",
     "services:up": "docker compose -f './src/infra/compose.yaml' up -d",
     "services:stop": "docker compose -f './src/infra/compose.yaml' stop",
-    "services:down": "docker compose -f './src/infra/compose.yaml' down"
+    "services:down": "docker compose -f './src/infra/compose.yaml' down",
+    "wait-for-postgres": "node ./src/infra/scripts/wait-for-postgres.js"
   },
   "dependencies": {
+    "concurrently": "^9.2.1",
     "dotenv": "^17.2.2",
-    "lint-staged": "^16.1.6",
     "next": "15.5.2",
     "pg": "^8.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "lint-staged": "^16.1.6",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3",
