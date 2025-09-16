@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npm run services:up && npm run wait-for-postgres && next dev -p 3000 && npm run services:stop",
-    "test": "npm run services:up && npm run wait-for-postgres && concurrently -n next,jest --hide next -s command-jest -k \"next dev\" \"jest --runInBand --verbose\" && npm run services:stop",
+    "dev": "npm run services:up && npm run services:wait:database && next dev -p 3000 && npm run services:stop",
+    "test": "npm run services:up && npm run services:wait:database && concurrently -n next,jest --hide next -s command-jest -k \"next dev\" \"jest --runInBand --verbose\" && npm run services:stop",
     "build": "next build",
     "start": "next start",
     "lint:prettier:check": "prettier --check .",
@@ -17,7 +17,7 @@
     "services:up": "docker compose -f './src/infra/compose.yaml' up -d",
     "services:stop": "docker compose -f './src/infra/compose.yaml' stop",
     "services:down": "docker compose -f './src/infra/compose.yaml' down",
-    "wait-for-postgres": "node ./src/infra/scripts/wait-for-postgres.js",
+    "services:wait:database": "node ./src/infra/scripts/wait-for-postgres.js",
     "migrations:create": "node-pg-migrate create -m ./src/infra/migrations",
     "migrations:up": "node-pg-migrate up -m ./src/infra/migrations -t 'pgmigrations'"
   },
