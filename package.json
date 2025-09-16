@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run services:up && npm run services:wait:database && next dev -p 3000 && npm run services:stop",
     "test": "npm run services:up && npm run services:wait:database && concurrently -n next,jest --hide next -s command-jest -k \"next dev\" \"jest --runInBand --verbose\" && npm run services:stop",
+    "test:watch": "jest --watchAll --runInBand --verbose",
     "build": "next build",
     "start": "next start",
     "lint:prettier:check": "prettier --check .",
