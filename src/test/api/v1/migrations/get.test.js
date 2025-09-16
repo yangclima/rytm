@@ -5,13 +5,17 @@ beforeAll(async () => {
   await orchestrator.clearDatabase();
 });
 
-test('GET to /api/v1/migrations', async () => {
-  const response = await fetch('http://localhost:3000/api/v1/migrations');
-  const responseBody = await response.json();
+describe('GET /api/v1/migrations', () => {
+  describe('Anonymous user', () => {
+    test('Retrieving pending migrations', async () => {
+      const response = await fetch('http://localhost:3000/api/v1/migrations');
+      const responseBody = await response.json();
 
-  const pendingMigrations = responseBody.pending_migrations;
-  const isArray = Array.isArray(pendingMigrations);
-  expect(isArray).toBeTruthy();
+      const pendingMigrations = responseBody.pending_migrations;
+      const isArray = Array.isArray(pendingMigrations);
+      expect(isArray).toBeTruthy();
 
-  expect(pendingMigrations.length).toBeGreaterThan(0);
+      expect(pendingMigrations.length).toBeGreaterThan(0);
+    });
+  });
 });
