@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "npm run services:up && npm run wait-for-postgres && next dev -p 3000 && npm run services:stop",
     "build": "next build",
     "start": "next start",
     "lint:prettier:check": "prettier --check .",
