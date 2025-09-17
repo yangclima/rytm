@@ -1,5 +1,15 @@
 import { Client } from 'pg';
 
+function getSSLValues() {
+  if (process.env.POSTGRES_CA) {
+    return {
+      ca: process.env.POSTGRES_CA,
+    };
+  }
+
+  return process.env.NODE_ENV === 'production' ? true : false;
+}
+
 async function getNewClient() {
   const client = new Client({
     host: process.env.POSTGRES_HOST,
@@ -7,6 +17,7 @@ async function getNewClient() {
     database: process.env.POSTGRES_DB,
     password: process.env.POSTGRES_PASSWORD,
     user: process.env.POSTGRES_USER,
+    ssl: getSSLValues(),
   });
 
   await client.connect();
