@@ -32,6 +32,16 @@ const eslintConfig = [
       'next-env.d.ts',
     ],
   },
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: { jsx: true },
+      },
+    },
+  },
 ];
 
 export default eslintConfig;
