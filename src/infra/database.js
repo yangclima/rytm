@@ -1,4 +1,5 @@
 import { Client } from 'pg';
+import { ServiceError } from './errors';
 
 function getSSLValues() {
   if (process.env.POSTGRES_CA) {
@@ -26,14 +27,15 @@ async function getNewClient() {
 }
 
 async function query(queryObject) {
-  const client = await getNewClient();
+  let client;
 
   try {
+    client = await getNewClient();
     const result = await client.query(queryObject);
     return result.rows;
   } catch (error) {
-    console.log(error);
-    throw error;
+    const errorObject = new ServiceError({ cause: error });
+    throw errorObject;
   } finally {
     client.end();
   }

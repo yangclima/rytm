@@ -1,27 +1,28 @@
 import migrator from 'models/migrator';
+import controller from 'infra/controller';
+import { createRouter } from 'next-connect';
 
-async function GET() {
+async function getHandler(req, res) {
   const pendingMigrations = await migrator.listPendingMigrations();
 
-  return { pending_migrations: pendingMigrations };
+  const status = 200;
+  const response = { pending_migrations: pendingMigrations };
+
+  return res.status(status).json(response);
 }
 
-async function POST() {
+async function postHandler(req, res) {
   const migratedMigrations = await migrator.runPendingMigrations();
 
-  return { migrated_migrations: migratedMigrations };
+  const status = migratedMigrations.length === 0 ? 200 : 201;
+  const response = { migrated_migrations: migratedMigrations };
+
+  return res.status(status).json(response);
 }
 
-async function migrationsRouter(req, res) {
-  if (req.method === 'GET') {
-    const pendingMigrations = await GET();
-    return res.status(200).json(pendingMigrations);
-  }
+const migrationsRouter = createRouter();
 
-  if (req.method === 'POST') {
-    const migratedMigrations = await POST();
-    return res.status(200).json(migratedMigrations);
-  }
-}
+migrationsRouter.get(getHandler);
+migrationsRouter.post(postHandler);
 
-export default migrationsRouter;
+export default migrationsRouter.handler(controller.errorHandler);
