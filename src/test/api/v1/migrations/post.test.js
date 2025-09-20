@@ -17,6 +17,8 @@ describe('POST /api/v1/migrations', () => {
         );
         const responseBody = await response.json();
 
+        expect(response.status).toBe(201);
+
         const migratedMigrations = responseBody.migrated_migrations;
         const isArray = Array.isArray(migratedMigrations);
         expect(isArray).toBeTruthy();
@@ -33,9 +35,11 @@ describe('POST /api/v1/migrations', () => {
         );
         const responseBody = await response.json();
 
+        expect(response.status).toBe(200);
+
         const migratedMigrations = responseBody.migrated_migrations;
-        const isArray2 = Array.isArray(migratedMigrations);
-        expect(isArray2).toBeTruthy();
+        const isArray = Array.isArray(migratedMigrations);
+        expect(isArray).toBeTruthy();
 
         expect(migratedMigrations.length).toBe(0);
       });
