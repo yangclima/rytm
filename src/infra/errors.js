@@ -8,10 +8,12 @@ export class InternalServerError extends Error {
 
   toJSON() {
     return {
-      name: this.name,
-      message: this.message,
-      action: this.action,
-      status: this.status,
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
     };
   }
 }
@@ -28,10 +30,12 @@ export class ServiceError extends Error {
 
   toJSON() {
     return {
-      name: this.name,
-      message: this.message,
-      action: this.action,
-      status: this.status,
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
     };
   }
 }
@@ -48,10 +52,12 @@ export class MethodNotAllowedError extends Error {
 
   toJSON() {
     return {
-      name: this.name,
-      message: this.message,
-      action: this.action,
-      status: this.status,
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
     };
   }
 }
@@ -68,10 +74,12 @@ export class ValidationError extends Error {
 
   toJSON() {
     return {
-      name: this.name,
-      message: this.message,
-      action: this.action,
-      status: this.status,
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
     };
   }
 }
@@ -88,10 +96,12 @@ export class BadRequestError extends Error {
 
   toJSON() {
     return {
-      name: this.name,
-      message: this.message,
-      action: this.action,
-      status: this.status,
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
     };
   }
 }

@@ -1,13 +1,28 @@
-import { MethodNotAllowedError, InternalServerError } from './errors';
+import {
+  MethodNotAllowedError,
+  InternalServerError,
+  ValidationError,
+  BadRequestError,
+} from './errors';
 
 function onNoMatch(req, res) {
-  const error = MethodNotAllowedError();
+  const error = new MethodNotAllowedError();
   return res.status(error.status).json(error);
 }
 
-function onError(err, req, res) {
-  const error = InternalServerError({ cause: err });
-  return res.status(error.status).json(error);
+function onError(error, req, res) {
+  console.error(error);
+
+  if (error instanceof ValidationError) {
+    return res.status(error.status).json(error);
+  }
+
+  if (error instanceof BadRequestError) {
+    return res.status(error.status).json(error);
+  }
+
+  const forbidenError = new InternalServerError({ cause: error });
+  return res.status(error.status).json(forbidenError);
 }
 
 const controller = {
