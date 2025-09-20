@@ -3,7 +3,7 @@ export class InternalServerError extends Error {
     super('Um erro interno inesperado ocorreu', { cause });
     this.name = 'InternalServerError';
     this.action = 'Por favor, contate o suporte';
-    this.status = status;
+    this.status = status || 500;
   }
 
   toJSON() {
@@ -44,6 +44,46 @@ export class MethodNotAllowedError extends Error {
     this.name = 'MethodNotAllowedError';
     this.action = 'Verifique se o método HTTP usado é válido para sse endpoint';
     this.status = 405;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status: this.status,
+    };
+  }
+}
+
+export class ValidationError extends Error {
+  constructor({ cause, message, action }) {
+    super(message, {
+      cause,
+    });
+    this.name = 'ValidationError';
+    this.action = action;
+    this.status = 401;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      status: this.status,
+    };
+  }
+}
+
+export class BadRequestError extends Error {
+  constructor({ cause, message, action }) {
+    super(message, {
+      cause,
+    });
+    this.name = 'BadRequestError';
+    this.action = action;
+    this.status = 400;
   }
 
   toJSON() {
