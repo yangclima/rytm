@@ -22,6 +22,13 @@ async function patchHandler(req, res) {
 
   const { email, username, password } = req.body;
 
+  if (req.body.id) {
+    throw new BadRequestError({
+      message: 'O campo id é imutável',
+      action: 'remova o campo "id" e tente novamente',
+    });
+  }
+
   if (!email && !username && !password) {
     throw new BadRequestError({
       message:
