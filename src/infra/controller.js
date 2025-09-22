@@ -4,6 +4,7 @@ import {
   ValidationError,
   BadRequestError,
   NotFoundError,
+  ServiceError,
 } from './errors';
 
 function onNoMatch(req, res) {
@@ -14,15 +15,12 @@ function onNoMatch(req, res) {
 function onError(error, req, res) {
   console.error(error);
 
-  if (error instanceof ValidationError) {
-    return res.status(error.status).json(error);
-  }
-
-  if (error instanceof BadRequestError) {
-    return res.status(error.status).json(error);
-  }
-
-  if (error instanceof NotFoundError) {
+  if (
+    error instanceof ValidationError ||
+    error instanceof ServiceError ||
+    error instanceof BadRequestError ||
+    error instanceof NotFoundError
+  ) {
     return res.status(error.status).json(error);
   }
 
