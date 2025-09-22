@@ -1,5 +1,10 @@
 import database from 'infra/database';
-import { BadRequestError, NotFoundError, ValidationError } from 'infra/errors';
+import {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  ValidationError,
+} from 'infra/errors';
 import password from './password';
 
 async function create(userInput) {
@@ -98,6 +103,7 @@ async function findOneById(id) {
       values: [id],
     });
   } catch (err) {
+    console.error(err);
     throw new BadRequestError({
       cause: err,
       message: 'O id fornecido é inválido',
@@ -127,8 +133,8 @@ async function validateUniqueEmail(email) {
   });
 
   if (result.length > 0) {
-    throw new ValidationError({
-      message: 'o email utilizado já está em uso',
+    throw new ConflictError({
+      message: 'o email enviado já está em uso',
       action: 'tente utilizar um outro email',
     });
   }

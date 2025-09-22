@@ -77,7 +77,7 @@ export class ValidationError extends Error {
     );
     this.name = 'ValidationError';
     this.action = action || 'verifique os dados enviados e tente novamente';
-    this.status = status || 401;
+    this.status = status || 400;
   }
 
   toJSON() {
@@ -119,10 +119,37 @@ export class NotFoundError extends Error {
     super(message || 'Não foi possível encontrar o recurso solicitado', {
       cause,
     });
-    this.name = 'ValidationError';
+    this.name = 'NotFoundError';
     this.action =
       action || 'Verifique as informações enviadas e tente novamente';
     this.status = status || 404;
+  }
+
+  toJSON() {
+    return {
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
+    };
+  }
+}
+
+export class ConflictError extends Error {
+  constructor({ cause, message, action, status }) {
+    super(
+      message ||
+        'Houve um erro de coflito entre as informações enviadas e as presentes na base de dado',
+      {
+        cause,
+      },
+    );
+    this.name = 'ConflictError';
+    this.action =
+      action || 'Verifique as informações enviadas e tente novamente';
+    this.status = status || 409;
   }
 
   toJSON() {

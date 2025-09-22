@@ -5,6 +5,7 @@ import {
   BadRequestError,
   NotFoundError,
   ServiceError,
+  ConflictError,
 } from './errors';
 
 function onNoMatch(req, res) {
@@ -19,6 +20,7 @@ function onError(error, req, res) {
     error instanceof ValidationError ||
     error instanceof ServiceError ||
     error instanceof BadRequestError ||
+    error instanceof ConflictError ||
     error instanceof NotFoundError
   ) {
     return res.status(error.status).json(error);
