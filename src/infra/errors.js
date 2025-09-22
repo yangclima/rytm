@@ -105,3 +105,26 @@ export class BadRequestError extends Error {
     };
   }
 }
+
+export class NotFoundError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || 'Não foi possível encontrar o recurso solicitado', {
+      cause,
+    });
+    this.name = 'ValidationError';
+    this.action =
+      action || 'Verifique as informações enviadas e tente novamente';
+    this.status = 404;
+  }
+
+  toJSON() {
+    return {
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
+    };
+  }
+}
