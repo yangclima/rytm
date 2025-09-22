@@ -80,7 +80,6 @@ describe('POST /api/v1/users', () => {
         });
 
         const responseBody = await response.json();
-        console.log(responseBody);
         expect(response.status).toBe(201);
         expect(responseBody).toHaveProperty('id');
         expect(responseBody).toMatchObject({
