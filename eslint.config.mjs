@@ -41,6 +41,12 @@ const eslintConfig = [
         ecmaFeatures: { jsx: true },
       },
     },
+    rules: {
+      'no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
   },
 ];
 

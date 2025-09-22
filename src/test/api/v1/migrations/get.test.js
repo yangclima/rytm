@@ -11,6 +11,8 @@ describe('GET /api/v1/migrations', () => {
       const response = await fetch('http://localhost:3000/api/v1/migrations');
       const responseBody = await response.json();
 
+      expect(response.status).toBe(200);
+
       const pendingMigrations = responseBody.pending_migrations;
       const isArray = Array.isArray(pendingMigrations);
       expect(isArray).toBeTruthy();
