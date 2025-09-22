@@ -3,6 +3,7 @@ import {
   InternalServerError,
   ValidationError,
   BadRequestError,
+  NotFoundError,
 } from './errors';
 
 function onNoMatch(req, res) {
@@ -18,6 +19,10 @@ function onError(error, req, res) {
   }
 
   if (error instanceof BadRequestError) {
+    return res.status(error.status).json(error);
+  }
+
+  if (error instanceof NotFoundError) {
     return res.status(error.status).json(error);
   }
 

@@ -1,5 +1,5 @@
 import database from 'infra/database';
-import { ValidationError } from 'infra/errors';
+import { BadRequestError, NotFoundError, ValidationError } from 'infra/errors';
 
 async function create({ email, username, password }) {
   await validateEmail(email);
@@ -20,6 +20,25 @@ async function create({ email, username, password }) {
 }
 
 async function update(id, { email, username, password }) {
+  async function runUpdateQuery(updatedUserData) {
+    const [updatedUser] = await database.query({
+      text: `
+      UPDATE users
+      SET email = $1, username = $2, password = $3
+      WHERE id = $4
+      RETURNING *
+      `,
+      values: [
+        updatedUserData.email,
+        updatedUserData.username,
+        updatedUserData.password,
+        updatedUserData.id,
+      ],
+    });
+
+    return updatedUser;
+  }
+
   const user = await findOneById(id);
 
   const newData = {};
@@ -45,26 +64,9 @@ async function update(id, { email, username, password }) {
   return updatedUser;
 }
 
-async function runUpdateQuery(updatedUserData) {
-  const [updatedUser] = await database.query({
-    text: `
-    UPDATE users
-    SET email = $1, username = $2, password = $3
-    WHERE id = $4
-    RETURNING *
-    `,
-    values: [
-      updatedUserData.email,
-      updatedUserData.username,
-      updatedUserData.password,
-      updatedUserData.id,
-    ],
-  });
-
-  return updatedUser;
-}
-
 async function findOneByEmail(email) {
+  await validateEmail(email);
+
   const [result] = await database.query({
     text: `
     SELECT *
@@ -75,21 +77,42 @@ async function findOneByEmail(email) {
     values: [email],
   });
 
+  if (!result) {
+    throw NotFoundError({
+      message:
+        'Nenhum usuário com esse id foi encontrado na nossa base de dados',
+      action: 'tente utilizar outro email ou verifique o email inserido',
+    });
+  }
+
   return result;
 }
 
 async function findOneById(id) {
-  const [result] = await database.query({
-    text: `
-    SELECT *
-    FROM users
-    WHERE id = $1
-    LIMIT 1
-    `,
-    values: [id],
-  });
+  let result;
 
-  return result;
+  try {
+    result = await database.query({
+      text: `SELECT * FROM users WHERE id = $1 LIMIT 1`,
+      values: [id],
+    });
+  } catch (err) {
+    throw new BadRequestError({
+      cause: err,
+      message: 'O id fornecido é inválido',
+      action: 'tente inserir outro id ou verifique o id inserido',
+    });
+  }
+
+  if (!result[0]) {
+    throw new NotFoundError({
+      message:
+        'Nenhum usuário com esse id foi encontrado na nossa base de dados',
+      action: 'tente inserir outro id ou verifique o id inserido',
+    });
+  }
+
+  return result[0];
 }
 
 async function validateUniqueEmail(email) {
@@ -138,8 +161,8 @@ async function validateEmail(email) {
 
   if (!isValidEmail) {
     throw new ValidationError({
-      message: 'Você precisa inserir um endereço de email válido',
-      action: 'Tente inserir um outro email',
+      message: 'O email inserido é inválido',
+      action: 'tente inserir outro id ou verifique o id inserido',
     });
   }
 }
