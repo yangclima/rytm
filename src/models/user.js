@@ -1,11 +1,12 @@
 import database from 'infra/database';
 import { BadRequestError, NotFoundError, ValidationError } from 'infra/errors';
+import password from './password';
 
-async function create({ email, username, password }) {
-  await validateEmail(email);
-  await validateUniqueEmail(email);
-  await validatePassword(password);
-  // TODO: HASH PASSWORD
+async function create(userInput) {
+  await validateEmail(userInput.email);
+  await validateUniqueEmail(userInput.email);
+  await validatePassword(userInput.password);
+  await hashPassword(userInput);
 
   const [result] = await database.query({
     text: `
@@ -13,13 +14,13 @@ async function create({ email, username, password }) {
     VALUES($1, $2, $3)
     RETURNING *
     `,
-    values: [username, email, password],
+    values: [userInput.username, userInput.email, userInput.password],
   });
 
   return result;
 }
 
-async function update(id, { email, username, password }) {
+async function update(id, userInput) {
   async function runUpdateQuery(updatedUserData) {
     const [updatedUser] = await database.query({
       text: `
@@ -43,19 +44,19 @@ async function update(id, { email, username, password }) {
 
   const newData = {};
 
-  if (email) {
-    await validateUniqueEmail(email);
-    await validateEmail(email);
-    newData.email = email;
+  if (userInput.email) {
+    await validateEmail(userInput.email);
+    await validateUniqueEmail(userInput.email);
+    newData.email = userInput.email;
   }
 
-  if (username) {
-    newData.username = username;
+  if (userInput.username) {
+    newData.username = userInput.username;
   }
 
-  if (password) {
-    // TODO: HASH PASSWORD
-    newData.password = password;
+  if (userInput.password) {
+    const hashedPassword = password.hash(userInput.password);
+    newData.password = hashedPassword;
   }
 
   const updatedUserData = { ...user, ...newData };
@@ -165,6 +166,11 @@ async function validateEmail(email) {
       action: 'tente inserir outro id ou verifique o id inserido',
     });
   }
+}
+
+async function hashPassword(userInputObject) {
+  const hashedPassword = await password.hash(userInputObject.password);
+  userInputObject.password = hashedPassword;
 }
 
 const user = {

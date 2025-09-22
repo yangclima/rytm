@@ -10,7 +10,10 @@ async function getHandler(req, res) {
 
   const { password: _, ...safeUser } = foundUser;
 
-  res.status(200).json(safeUser);
+  const status = 200;
+  const response = safeUser;
+
+  res.status(status).json(response);
 }
 
 const usersIdRouter = createRouter();

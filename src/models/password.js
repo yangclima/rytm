@@ -6,11 +6,11 @@ function getWorkFactor() {
 
 async function hash(rawPassword) {
   const workFactor = getWorkFactor();
-  await bcryptjs.hash(rawPassword, workFactor);
+  return await bcryptjs.hash(rawPassword, workFactor);
 }
 
 async function compare(providedPassword, storedPassword) {
-  await bcryptjs.compare(providedPassword, storedPassword);
+  return await bcryptjs.compare(providedPassword, storedPassword);
 }
 
 const password = {

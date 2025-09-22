@@ -31,7 +31,7 @@ export const up = (pgm) => {
     },
 
     password: {
-      type: 'varchar(50)',
+      type: 'varchar(60)',
       notNull: true,
     },
   });
