@@ -1,5 +1,5 @@
 export class InternalServerError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(message || 'Um erro interno inesperado ocorreu', { cause });
     this.name = 'InternalServerError';
     this.action = action || 'Por favor, contate o suporte';
@@ -19,7 +19,7 @@ export class InternalServerError extends Error {
 }
 
 export class ServiceError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(
       message || 'Um erro inesperado ocorreu em uma das nossas dependências',
       {
@@ -44,7 +44,7 @@ export class ServiceError extends Error {
 }
 
 export class MethodNotAllowedError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(message || 'Método não permitido para esse endpoint', {
       cause,
     });
@@ -67,7 +67,7 @@ export class MethodNotAllowedError extends Error {
 }
 
 export class ValidationError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(
       message ||
         'Ocorreu um erro de validação, existe alguma inconsistência nos dados enviados',
@@ -93,7 +93,7 @@ export class ValidationError extends Error {
 }
 
 export class BadRequestError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(message || 'A requisição enviada possui algum erro', {
       cause,
     });
@@ -115,7 +115,7 @@ export class BadRequestError extends Error {
 }
 
 export class NotFoundError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(message || 'Não foi possível encontrar o recurso solicitado', {
       cause,
     });
@@ -138,7 +138,7 @@ export class NotFoundError extends Error {
 }
 
 export class ConflictError extends Error {
-  constructor({ cause, message, action, status }) {
+  constructor({ cause, message, action, status } = {}) {
     super(
       message ||
         'Houve um erro de coflito entre as informações enviadas e as presentes na base de dado',
@@ -150,6 +150,28 @@ export class ConflictError extends Error {
     this.action =
       action || 'Verifique as informações enviadas e tente novamente';
     this.status = status || 409;
+  }
+
+  toJSON() {
+    return {
+      error: {
+        name: this.name,
+        message: this.message,
+        action: this.action,
+        status: this.status,
+      },
+    };
+  }
+}
+
+export class UnauthorizedError extends Error {
+  constructor({ cause, message, action, status } = {}) {
+    super(message || 'Usuário não autenticado', {
+      cause,
+    });
+    this.name = 'UnauthorizedError';
+    this.action = action || 'Faça login novamente para continuar';
+    this.status = status || 401;
   }
 
   toJSON() {
