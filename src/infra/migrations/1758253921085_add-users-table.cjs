@@ -1,6 +1,3 @@
-/* eslint-disable no-unused-vars */
-// MOCK MIGRATION
-
 exports.up = (pgm) => {
   pgm.createTable('users', {
     id: {
@@ -27,4 +24,4 @@ exports.up = (pgm) => {
   });
 };
 
-exports.down = (pgm) => false;
+exports.down = false;
