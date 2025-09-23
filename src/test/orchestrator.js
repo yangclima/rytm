@@ -1,7 +1,9 @@
+import crypto from 'node:crypto';
 import retry from 'async-retry';
 import { faker } from '@faker-js/faker';
 import database from 'infra/database';
 import migrator from 'models/migrator';
+import session from 'models/session';
 import user from 'models/user';
 
 async function waitForAllServices() {
@@ -38,11 +40,35 @@ async function createUser(userInfo) {
   return await user.create(newUser);
 }
 
+async function createSession(sessionInfo) {
+  const token = crypto.randomBytes(48).toString('hex');
+
+  const userId = sessionInfo?.userId;
+  const expiresAt =
+    sessionInfo?.expiresAt ||
+    new Date(Date.now() + session.EXPIRATION_IN_MILISECONDS);
+
+  const [newSession] = await database.query({
+    text: `
+      INSERT INTO 
+        sessions(token, user_id, expires_at)
+      VALUES
+        ($1, $2, $3)
+      RETURNING 
+        *
+      `,
+    values: [token, userId, expiresAt],
+  });
+
+  return newSession;
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendinMigrations,
   createUser,
+  createSession,
 };
 
 export default orchestrator;
