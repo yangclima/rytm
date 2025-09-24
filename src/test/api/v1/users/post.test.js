@@ -69,22 +69,33 @@ describe('POST /api/v1/users', () => {
       });
 
       test('With valid data', async () => {
+        await orchestrator.clearEmailBox();
+
+        const email = 'validemail@example.com';
+        const username = 'validuser';
+        const password = 'ValidP4ssW0rd';
+
         const response = await fetch(baseUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: 'validemail@example.com',
-            username: 'validuser',
-            password: 'ValidP4ssW0rd',
+            email: email,
+            username: username,
+            password: password,
           }),
         });
 
         const responseBody = await response.json();
+
+        const confirmationEmail = await orchestrator.getLastEmail();
+        expect(confirmationEmail.text.includes(username)).toBeTruthy();
+        expect(confirmationEmail.recipients[0].includes(email)).toBeTruthy();
+
         expect(response.status).toBe(201);
         expect(responseBody).toHaveProperty('id');
         expect(responseBody).toMatchObject({
-          email: 'validemail@example.com',
-          username: 'validuser',
+          email: email,
+          username: username,
         });
       });
 

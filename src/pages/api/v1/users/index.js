@@ -3,6 +3,7 @@ import { createRouter } from 'next-connect';
 import controller from 'infra/controller';
 import user from 'models/user';
 import { BadRequestError } from 'infra/errors';
+import activation from 'models/activation';
 
 async function postHandler(req, res) {
   const { email, username, password } = req.body;
@@ -26,6 +27,9 @@ async function postHandler(req, res) {
   }
 
   const newUser = await user.create({ email, username, password });
+
+  await activation.createTokenAndSendEmail(newUser);
+
   const { password: _, ...safeUser } = newUser;
 
   const status = 201;
