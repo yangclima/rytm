@@ -133,7 +133,7 @@ async function setUsedToken(token) {
 }
 
 function getActivationPageUrl(token) {
-  return `${process.env.WEBSERVER_BASE_URL}/cadastro/activate/${token}`;
+  return `${process.env.WEBSERVER_BASE_URL}/cadastro/ativar/${token}`;
 }
 
 const activation = {
