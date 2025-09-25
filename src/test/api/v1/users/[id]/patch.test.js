@@ -19,12 +19,12 @@ describe('PATCH /api/v1/users/:id', () => {
       const body = await response.json();
       expect(response.status).toBe(400);
       expect(body).toHaveProperty('error');
-      expect(body.error.name).toBe('BadRequestError');
+      expect(body.error.name).toBe('ValidationError');
     });
 
     test('With non-existing user id', async () => {
       const response = await fetch(
-        `${baseUrl}/00000000-0000-0000-0000-000000000000`,
+        `${baseUrl}/00000000-0000-1000-8000-000000000000`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

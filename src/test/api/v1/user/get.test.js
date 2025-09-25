@@ -54,7 +54,6 @@ describe('GET /api/v1/user', () => {
 
       const responseBody = await response.json();
 
-      console.log(responseBody);
       expect(response.status).toBe(401);
       expect(responseBody).toHaveProperty('error');
       const error = responseBody.error;
