@@ -15,7 +15,11 @@ const AccountActivationPage = () => {
 
     const activateAccount = async () => {
       try {
-        const response = await fetch(`/api/v1/activation/${token}`);
+        const response = await fetch('/api/v1/activation', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token }),
+        });
         let responseBody;
 
         switch (response.status) {

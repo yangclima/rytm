@@ -9,12 +9,16 @@ beforeAll(async () => {
   await orchestrator.clearEmailBox();
 });
 
-describe('GET /api/v1/activation/[token]', () => {
+describe('GET /api/v1/activation', () => {
   describe('Anonymous user', () => {
     test('With invalid token', async () => {
       const invalidToken = 'invalid_token_123';
-      const response = await fetch(`${baseUrl}/${invalidToken}`, {
-        method: 'GET',
+      const response = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: invalidToken,
+        }),
       });
 
       const responseBody = await response.json();
@@ -25,15 +29,25 @@ describe('GET /api/v1/activation/[token]', () => {
     });
 
     test('With empty token', async () => {
-      const response = await fetch(`${baseUrl}/`, { method: 'GET' });
+      const response = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: '',
+        }),
+      });
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(400);
     });
 
     test('With non-existent token', async () => {
       const nonExistentToken = '00000000-0000-1000-8000-000000000000';
-      const response = await fetch(`${baseUrl}/${nonExistentToken}`, {
-        method: 'GET',
+      const response = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: nonExistentToken,
+        }),
       });
 
       const responseBody = await response.json();
@@ -56,7 +70,13 @@ describe('GET /api/v1/activation/[token]', () => {
         new Date(),
       );
 
-      const response = await fetch(`${baseUrl}/${actvationObject.token}`);
+      const response = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: actvationObject.token,
+        }),
+      });
       const responseBody = await response.json();
 
       const secondEmail = await orchestrator.getLastEmail();
@@ -80,13 +100,17 @@ describe('GET /api/v1/activation/[token]', () => {
         username: 'validuser',
       });
 
-      const activationToken = await orchestrator.createActivationToken(
+      const activationObject = await orchestrator.createActivationToken(
         createdUser.id,
         new Date(Date.now() + 1000 * 60 * 60 * 24),
       );
 
-      const response = await fetch(`${baseUrl}/${activationToken.token}`, {
-        method: 'GET',
+      const response = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: activationObject.token,
+        }),
       });
       const responseBody = await response.json();
 
@@ -106,22 +130,29 @@ describe('GET /api/v1/activation/[token]', () => {
         email_confirmed: false,
       });
 
-      const activationToken = await orchestrator.createActivationToken(
+      const activationObject = await orchestrator.createActivationToken(
         createdUser.id,
         new Date(Date.now() + 1000 * 60 * 60 * 24),
       );
 
       // First activation - should work
-      const firstResponse = await fetch(`${baseUrl}/${activationToken.token}`, {
-        method: 'GET',
+      const firstResponse = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: activationObject.token,
+        }),
       });
       expect(firstResponse.status).toBe(200);
 
       // Second activation with same token - should return 204
-      const secondResponse = await fetch(
-        `${baseUrl}/${activationToken.token}`,
-        { method: 'GET' },
-      );
+      const secondResponse = await fetch(`${baseUrl}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: activationObject.token,
+        }),
+      });
       expect(secondResponse.status).toBe(204);
     });
   });
