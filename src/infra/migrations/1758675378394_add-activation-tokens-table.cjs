@@ -4,7 +4,7 @@
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('email_confirmation_tokens', {
+  pgm.createTable('activation_tokens', {
     token: {
       type: 'uuid',
       primaryKey: true,

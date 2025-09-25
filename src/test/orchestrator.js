@@ -79,7 +79,7 @@ async function createActivationToken(userId, expiresAt) {
   const [confirmationToken] = await database.query({
     text: `
     INSERT INTO 
-      email_confirmation_tokens(user_id, expires_at)
+      activation_tokens(user_id, expires_at)
     VALUES
       ($1, $2)
     RETURNING

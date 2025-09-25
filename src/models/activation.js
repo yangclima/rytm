@@ -16,7 +16,7 @@ async function createToken(userId) {
   const [confirmationToken] = await database.query({
     text: `
     INSERT INTO 
-      email_confirmation_tokens(user_id, expires_at)
+      activation_tokens(user_id, expires_at)
     VALUES
       ($1, $2)
     RETURNING
@@ -78,7 +78,7 @@ async function activateUserUsingToken(token) {
       SELECT
         *
       FROM 
-        email_confirmation_tokens
+        activation_tokens
       WHERE
         token = $1
       LIMIT
@@ -118,7 +118,7 @@ async function setUsedToken(token) {
   const usedToken = await database.query({
     text: `
     UPDATE
-      email_confirmation_tokens
+      activation_tokens
     SET
       used_at = NOW()
     WHERE
