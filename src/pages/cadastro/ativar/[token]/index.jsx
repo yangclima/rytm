@@ -30,7 +30,7 @@ const AccountActivationPage = () => {
               return { ...prev, ...responseBody };
             });
             break;
-          case 204:
+          case 409:
             setActivationState('already-activated');
             break;
           case 401:

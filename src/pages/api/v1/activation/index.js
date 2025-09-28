@@ -15,12 +15,6 @@ async function patchHandler(req, res) {
 
   const activedUser = await activation.activateUserUsingToken(token);
 
-  if (!activedUser) {
-    const status = 204;
-
-    return res.status(status).json();
-  }
-
   const { password: _, ...safeUser } = activedUser;
 
   const response = safeUser;

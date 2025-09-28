@@ -3,6 +3,7 @@ import { createRouter } from 'next-connect';
 import user from 'models/user';
 import controller from 'infra/controller';
 import { BadRequestError } from 'infra/errors';
+import emailConfirmation from 'models/emailConfirmation';
 
 async function getHandler(req, res) {
   const { id } = req.query;
@@ -37,7 +38,20 @@ async function patchHandler(req, res) {
     });
   }
 
-  const updatedUser = await user.update(id, req.body);
+  const updatedUserData = {
+    password,
+    username,
+  };
+
+  if (email) {
+    await emailConfirmation.createTokenAndSendEmail({
+      id,
+      email,
+      ...updatedUserData,
+    });
+  }
+
+  const updatedUser = await user.update(id, updatedUserData);
   const { password: _, ...safeUser } = updatedUser;
 
   const status = 201;

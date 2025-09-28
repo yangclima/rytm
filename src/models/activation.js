@@ -1,10 +1,11 @@
 import email from 'infra/email';
-import confirmationEmail from './templates/confirmationEmail';
+import activationEmail from './templates/activationEmail';
 import database from 'infra/database';
 import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
+  ConflictError,
 } from 'infra/errors';
 import user from './user';
 
@@ -29,7 +30,7 @@ async function createToken(userId) {
 }
 
 async function sendEmail(user, token) {
-  const { text, html } = confirmationEmail({
+  const { text, html } = activationEmail({
     username: user.username,
     activationUrl: getActivationPageUrl(token),
   });
@@ -96,7 +97,11 @@ async function activateUserUsingToken(token) {
 
   const isUsedToken = Boolean(foundToken.used_at);
   if (isUsedToken) {
-    return;
+    throw new ConflictError({
+      message: 'Este token já foi utilizado',
+      action:
+        'Cheque se a conta já foi ativada ou se você utilizou o token correto',
+    });
   }
 
   if (foundToken.expires_at < Date.now()) {
