@@ -153,7 +153,10 @@ describe('GET /api/v1/activation', () => {
           token: activationObject.token,
         }),
       });
-      expect(secondResponse.status).toBe(204);
+      const secondBody = await secondResponse.json();
+      expect(secondResponse.status).toBe(409);
+      expect(secondBody).toHaveProperty('error');
+      expect(secondBody.error.name).toBe('ConflictError');
     });
   });
 });

@@ -83,7 +83,7 @@ async function findOneByEmail(email) {
   });
 
   if (!result) {
-    throw NotFoundError({
+    throw new NotFoundError({
       message:
         'Nenhum usuário com esse id foi encontrado na nossa base de dados',
       action: 'tente utilizar outro email ou verifique o email inserido',
@@ -206,6 +206,8 @@ const user = {
   findOneByEmail,
   findOneById,
   activate,
+  validateUniqueEmail,
+  validateEmail,
 };
 
 export default user;

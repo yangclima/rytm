@@ -29,28 +29,28 @@ async function createToken(userId, email) {
   return confirmationToken;
 }
 
-async function sendEmail(user, token) {
-  console.log(user);
-  console.log(token);
-  console.log(getConfirmationPageUrl(token));
+async function sendEmail(userData, token) {
   const { text, html } = confirmationEmail({
-    username: user.username,
+    username: userData.username,
     confirmationUrl: getConfirmationPageUrl(token),
   });
 
   await email.send({
     from: 'Rytm <rytme@yanlima.com>',
-    to: user.email,
+    to: userData.email,
     subject: 'Confirmação de email',
     text,
     html,
   });
 }
 
-async function createTokenAndSendEmail(user) {
-  const confirmationObject = await createToken(user.id, user.email);
+async function createTokenAndSendEmail(userData) {
+  await user.validateUniqueEmail(userData.email);
+  await user.validateEmail(userData.email);
 
-  await sendEmail(user, confirmationObject.token);
+  const confirmationObject = await createToken(userData.id, userData.email);
+
+  await sendEmail(userData, confirmationObject.token);
 }
 
 function validateUUIDToken(token) {

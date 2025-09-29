@@ -97,12 +97,14 @@ describe('PATCH /api/v1/users/:id', () => {
     });
 
     test('Updating email and username together', async () => {
+      await orchestrator.clearEmailBox();
       const createdUser = await orchestrator.createUser();
 
       const payload = {
         email: 'updateduser@example.com',
         username: 'updateduser',
       };
+
       const response = await fetch(`${baseUrl}/${createdUser.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -111,7 +113,12 @@ describe('PATCH /api/v1/users/:id', () => {
       const body = await response.json();
       expect(response.status).toBe(201);
       expect(body).toHaveProperty('id');
-      expect(body).toMatchObject(payload);
+      expect(body.username).toBe(payload.username);
+
+      const email = await orchestrator.getLastEmail();
+
+      expect(email.recipients[0].includes(payload.email)).toBeTruthy();
+      expect(email.text.includes(payload.username)).toBeTruthy();
     });
 
     test('Attempting to update immutable id field (should be ignored or error)', async () => {
