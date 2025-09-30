@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 
-const AccountActivationPage = () => {
-  // 'loading', 'success', 'error', 'expired', 'already-activated'
-  const [activationState, setActivationState] = useState('loading');
+const EmailChangeConfirmationPage = () => {
+  // 'loading', 'success', 'error', 'expired', 'already-confirmed'
+  const [confirmationState, setConfirmationState] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [userInfo, setUserInfo] = useState({});
 
@@ -13,7 +13,7 @@ const AccountActivationPage = () => {
   useEffect(() => {
     if (!token) return;
 
-    const activateAccount = async () => {
+    const confirmEmailChange = async () => {
       try {
         const response = await fetch('/api/v1/email-confirmation', {
           method: 'PATCH',
@@ -25,34 +25,34 @@ const AccountActivationPage = () => {
         switch (response.status) {
           case 200:
             responseBody = await response.json();
-            setActivationState('success');
+            setConfirmationState('success');
             setUserInfo((prev) => {
               return { ...prev, ...responseBody };
             });
             break;
           case 409:
-            setActivationState('already-activated');
+            setConfirmationState('already-confirmed');
             break;
           case 401:
             responseBody = await response.json();
-            setActivationState('expired');
+            setConfirmationState('expired');
             setErrorMessage(responseBody.error.message);
             break;
           default:
             responseBody = await response.json();
-            setActivationState('error');
+            setConfirmationState('error');
             setErrorMessage(responseBody.error.message);
         }
       } catch (err) {
         console.error(err);
-        setActivationState('error');
+        setConfirmationState('error');
         setErrorMessage(
           'Erro interno do servidor. Tente novamente mais tarde.',
         );
       }
     };
 
-    activateAccount();
+    confirmEmailChange();
   }, [token, router]);
 
   const LoadingState = () => (
@@ -64,10 +64,10 @@ const AccountActivationPage = () => {
         </div>
       </div>
       <h2 className="text-2xl font-bold text-white mb-4">
-        Ativando sua conta...
+        Confirmando mudança de email...
       </h2>
       <p className="text-white/70 mb-6">
-        Aguarde enquanto verificamos seu token de ativação
+        Aguarde enquanto verificamos seu token de confirmação
       </p>
       <div className="flex items-center justify-center gap-2 mt-4">
         {[0, 1, 2].map((i) => (
@@ -116,11 +116,11 @@ const AccountActivationPage = () => {
       </div>
 
       <h2 className="text-3xl font-bold text-white mb-4">
-        🎉 Conta Ativada com Sucesso!
+        🎉 Email Alterado com Sucesso!
       </h2>
       <p className="text-white/80 text-lg mb-8">
-        Parabéns <span className={'font-bold'}>{userInfo.username}</span>! Sua
-        conta foi ativada e você já pode começar a usar o Rytm.
+        Parabéns <span className={'font-bold'}>{userInfo.username}</span>! Seu
+        email foi alterado e atualizado com sucesso.
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -153,10 +153,11 @@ const AccountActivationPage = () => {
       </div>
 
       <h2 className="text-3xl font-bold text-white mb-4 text-center">
-        ❌ Falha na Ativação
+        ❌ Falha na Confirmação
       </h2>
       <p className="text-white/80 text-lg mb-6 text-center">
-        Não foi possível ativar sua conta. Verifique as informações abaixo.
+        Não foi possível confirmar a mudança de email. Verifique as informações
+        abaixo.
       </p>
 
       <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 mb-8">
@@ -177,7 +178,7 @@ const AccountActivationPage = () => {
             </svg>
           </div>
           <div>
-            <p className="text-red-400 font-medium">Erro de Ativação</p>
+            <p className="text-red-400 font-medium">Erro de Confirmação</p>
             <p className="text-red-300/80 text-sm">{errorMessage}</p>
           </div>
         </div>
@@ -205,7 +206,8 @@ const AccountActivationPage = () => {
 
       <h2 className="text-3xl font-bold text-white mb-4">⏰ Link Expirado</h2>
       <p className="text-white/80 text-lg mb-6">
-        Por motivos de segurança um novo email de ativação foi enviado.
+        Por motivos de segurança, você precisará solicitar a mudança de email
+        novamente.
       </p>
 
       <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-6 mb-8">
@@ -227,10 +229,10 @@ const AccountActivationPage = () => {
           </div>
           <div>
             <p className="text-yellow-400 font-medium">
-              Links de ativação são válidos por 15 minutos
+              Links de confirmação são válidos por 15 minutos
             </p>
             <p className="text-yellow-300/80 text-sm">
-              Por segurança, um novo link será enviado
+              Por segurança, solicite a mudança novamente
             </p>
           </div>
         </div>
@@ -238,7 +240,7 @@ const AccountActivationPage = () => {
     </div>
   );
 
-  const AlreadyActivatedState = () => (
+  const AlreadyConfirmedState = () => (
     <div className="text-center">
       <div className="w-24 h-24 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/30">
         <svg
@@ -257,10 +259,10 @@ const AccountActivationPage = () => {
       </div>
 
       <h2 className="text-3xl font-bold text-white mb-4">
-        ✅ Conta Já Ativada
+        ✅ Email Já Confirmado
       </h2>
       <p className="text-white/80 text-lg mb-6">
-        Sua conta já foi ativada anteriormente e está pronta para uso!
+        Este email já foi confirmado anteriormente e está ativo na sua conta!
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -275,13 +277,13 @@ const AccountActivationPage = () => {
   );
 
   const renderContent = () => {
-    switch (activationState) {
+    switch (confirmationState) {
       case 'loading':
         return <LoadingState />;
       case 'success':
         return <SuccessState />;
-      case 'already-activated':
-        return <AlreadyActivatedState />;
+      case 'already-confirmed':
+        return <AlreadyConfirmedState />;
       case 'error':
         return <ErrorState />;
       case 'expired':
@@ -304,7 +306,9 @@ const AccountActivationPage = () => {
               Rytm
             </h1>
           </div>
-          <p className="text-white/60 text-lg">Ativação de Conta</p>
+          <p className="text-white/60 text-lg">
+            Confirmação de Mudança de Email
+          </p>
         </div>
 
         {/* Main Content */}
@@ -323,4 +327,4 @@ const AccountActivationPage = () => {
   );
 };
 
-export default AccountActivationPage;
+export default EmailChangeConfirmationPage;
