@@ -108,7 +108,7 @@ async function confirmEmailUsingToken(token) {
 
   const toConfirmUser = await user.findOneById(foundToken.user_id);
 
-  const confirmedEmailUser = user.update({
+  const confirmedEmailUser = user.update(toConfirmUser.id, {
     ...toConfirmUser,
     email: foundToken.email,
   });
