@@ -1,0 +1,31 @@
+/**
+ * @param pgm {import('node-pg-migrate').MigrationBuilder}
+ * @param run {() => void | undefined}
+ * @returns {Promise<void> | void}
+ */
+exports.up = (pgm) => {
+  pgm.createTable('activation_tokens', {
+    token: {
+      type: 'uuid',
+      primaryKey: true,
+      default: pgm.func('gen_random_uuid()'),
+    },
+
+    user_id: {
+      type: 'uuid',
+      notNull: true,
+    },
+
+    expires_at: {
+      type: 'timestamptz',
+      notNull: true,
+    },
+
+    used_at: {
+      type: 'timestamptz',
+      notNull: false,
+    },
+  });
+};
+
+exports.down = false;

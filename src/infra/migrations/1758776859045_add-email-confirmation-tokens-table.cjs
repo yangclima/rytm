@@ -16,6 +16,11 @@ exports.up = (pgm) => {
       notNull: true,
     },
 
+    email: {
+      type: 'varchar(50)',
+      notNull: true,
+    },
+
     expires_at: {
       type: 'timestamptz',
       notNull: true,

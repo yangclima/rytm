@@ -1,17 +1,19 @@
 import controller from 'infra/controller';
+import { BadRequestError } from 'infra/errors';
 import activation from 'models/activation';
 import { createRouter } from 'next-connect';
 
-async function getHandler(req, res) {
-  const { token } = req.query;
+async function patchHandler(req, res) {
+  const token = req.body?.token;
+
+  if (!token) {
+    throw new BadRequestError({
+      message: 'Você precisa enviar um token válido para realizar a ativação',
+      action: 'verifique as informações e tente novamente',
+    });
+  }
 
   const activedUser = await activation.activateUserUsingToken(token);
-
-  if (!activedUser) {
-    const status = 204;
-
-    return res.status(status).json();
-  }
 
   const { password: _, ...safeUser } = activedUser;
 
@@ -23,6 +25,6 @@ async function getHandler(req, res) {
 
 const activationController = createRouter();
 
-activationController.get(getHandler);
+activationController.patch(patchHandler);
 
 export default activationController.handler(controller.errorHandler);

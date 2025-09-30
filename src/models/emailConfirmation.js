@@ -1,61 +1,56 @@
 import email from 'infra/email';
-import activationEmail from './templates/activationEmail';
+import confirmationEmail from './templates/confirmationEmail';
 import database from 'infra/database';
 import {
+  ConflictError,
   NotFoundError,
   UnauthorizedError,
   ValidationError,
-  ConflictError,
 } from 'infra/errors';
 import user from './user';
 
 const EXPIRATION_IN_MILISECONDS = 1000 * 60 * 15;
 
-async function createToken(userId) {
+async function createToken(userId, email) {
   const expiresAt = new Date(Date.now() + EXPIRATION_IN_MILISECONDS);
 
   const [confirmationToken] = await database.query({
     text: `
     INSERT INTO 
-      activation_tokens(user_id, expires_at)
+      email_confirmation_tokens(user_id, email, expires_at)
     VALUES
-      ($1, $2)
+      ($1, $2, $3)
     RETURNING
       *
     `,
-    values: [userId, expiresAt],
+    values: [userId, email, expiresAt],
   });
 
   return confirmationToken;
 }
 
-async function sendEmail(user, token) {
-  const { text, html } = activationEmail({
-    username: user.username,
-    activationUrl: getActivationPageUrl(token),
+async function sendEmail(userData, token) {
+  const { text, html } = confirmationEmail({
+    username: userData.username,
+    confirmationUrl: getConfirmationPageUrl(token),
   });
 
   await email.send({
     from: 'Rytm <rytme@yanlima.com>',
-    to: user.email,
-    subject: 'Ative sua conta Rytme',
+    to: userData.email,
+    subject: 'Confirmação de email',
     text,
     html,
   });
 }
 
-async function createTokenAndSendEmail(user) {
-  const activationObject = await createToken(user.id);
+async function createTokenAndSendEmail(userData) {
+  await user.validateUniqueEmail(userData.email);
+  await user.validateEmail(userData.email);
 
-  await sendEmail(user, activationObject.token);
-}
+  const confirmationObject = await createToken(userData.id, userData.email);
 
-async function createTokenAndResendEmail(userId) {
-  const activationObject = await createToken(userId);
-
-  const foundUser = await user.findOneById(userId);
-
-  await sendEmail(foundUser, activationObject.token);
+  await sendEmail(userData, confirmationObject.token);
 }
 
 function validateUUIDToken(token) {
@@ -71,7 +66,7 @@ function validateUUIDToken(token) {
   }
 }
 
-async function activateUserUsingToken(token) {
+async function confirmEmailUsingToken(token) {
   validateUUIDToken(token);
 
   const [foundToken] = await database.query({
@@ -79,7 +74,7 @@ async function activateUserUsingToken(token) {
       SELECT
         *
       FROM 
-        activation_tokens
+        email_confirmation_tokens
       WHERE
         token = $1
       LIMIT
@@ -100,30 +95,34 @@ async function activateUserUsingToken(token) {
     throw new ConflictError({
       message: 'Este token já foi utilizado',
       action:
-        'Cheque se a conta já foi ativada ou se você utilizou o token correto',
+        'Cheque se o email já foi confirmado ou se você utilizou o token correto',
     });
   }
 
   if (foundToken.expires_at < Date.now()) {
-    await createTokenAndResendEmail(foundToken.user_id);
     throw new UnauthorizedError({
       message: 'O token está expirado',
-      action: 'Um novo link de confirmação foi pro seu email',
+      action: 'Tente realizar novamente a alteração de email',
     });
   }
 
-  const activedUser = await user.activate(foundToken.user_id);
+  const toConfirmUser = await user.findOneById(foundToken.user_id);
+
+  const confirmedEmailUser = user.update(toConfirmUser.id, {
+    ...toConfirmUser,
+    email: foundToken.email,
+  });
 
   await setUsedToken(token);
 
-  return activedUser;
+  return confirmedEmailUser;
 }
 
 async function setUsedToken(token) {
   const usedToken = await database.query({
     text: `
     UPDATE
-      activation_tokens
+      email_confirmation_tokens
     SET
       used_at = NOW()
     WHERE
@@ -137,16 +136,15 @@ async function setUsedToken(token) {
   return usedToken;
 }
 
-function getActivationPageUrl(token) {
-  return `${process.env.WEBSERVER_BASE_URL}/cadastro/ativar/${token}`;
+function getConfirmationPageUrl(token) {
+  return `${process.env.WEBSERVER_BASE_URL}/cadastro/confirmar/${token}`;
 }
 
-const activation = {
+const emailConfirmation = {
   createToken,
   sendEmail,
   createTokenAndSendEmail,
-  activateUserUsingToken,
-  createTokenAndResendEmail,
+  confirmEmailUsingToken,
 };
 
-export default activation;
+export default emailConfirmation;
